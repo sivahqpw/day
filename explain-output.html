@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Explain The Output</title>
+  <style>
+    :root {
+      /* RADICAL REPORTS COLOUR PALETTE */
+      --primary: #204d4f;      /* Deep Teal - Primary */
+      --secondary: #426a6c;    /* Muted Teal - Secondary */
+      --accent: #739395;       /* Sage Teal - Accent */
+      --border-clr: #a9c1c2;   /* Soft Mint - Borders */
+      --light-bg: #dbeeef;     /* Pale Mint - Background */
+      
+      --ink: #1e2b2c;
+      --muted: #426a6c;
+      --paper: #ffffff;
+      --page-bg: var(--light-bg);
+      --line: var(--border-clr);
+      --shadow: 0 10px 30px rgba(32, 77, 79, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--page-bg);
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    .page-wrap {
+      width: min(950px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 40px 0 80px;
+    }
+
+    /* HEADER */
+    .hero {
+      text-align: left;
+      margin-bottom: 40px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-clr);
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 16px;
+      max-width: 750px;
+      color: var(--secondary);
+      line-height: 1.6;
+    }
+
+    /* CARDS */
+    .section-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+
+    .section-head {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      padding: 24px;
+      background: #fcfdfe;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .step-icon {
+      flex: 0 0 auto;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      background: var(--primary);
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 20px;
+      color: var(--primary);
+      letter-spacing: -0.02em;
+    }
+
+    .section-body { padding: 24px; }
+
+    label {
+      display: block;
+      margin: 0 0 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--secondary);
+      line-height: 1.4;
+    }
+
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border-clr);
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px;
+      font: inherit;
+      color: var(--ink);
+      outline: none;
+      transition: all 0.2s ease;
+      margin-bottom: 24px;
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(32, 77, 79, 0.08);
+    }
+
+    #generatedPrompt {
+      min-height: 450px;
+      background: #f9fbfc;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 13px;
+      color: var(--primary);
+    }
+
+    /* BUTTONS */
+    .button-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+
+    button, .link-button {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+
+    .primary-btn { color: #fff; background: var(--primary); }
+    .primary-btn:hover { background: var(--secondary); transform: translateY(-1px); }
+
+    .secondary-btn { color: var(--primary); background: #fff; border: 1px solid var(--border-clr); }
+    .secondary-btn:hover { background: #f0f6f6; }
+
+    .copy-btn { color: #fff; background: var(--accent); }
+    .copy-btn:hover { background: var(--secondary); }
+
+    /* GRID FOR INPUTS */
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 800px) {
+      .input-grid { grid-template-columns: 1fr; }
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      left: 50%; bottom: 30px; transform: translateX(-50%);
+      background: var(--primary); color: #fff;
+      padding: 8px 16px; border-radius: 8px; font-size: 13px;
+      opacity: 0; transition: 0.3s; pointer-events: none;
+      z-index: 1000;
+    }
+    .toast.show { opacity: 1; }
+
+    footer {
+      margin-top: 60px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-wrap">
+    <header class="hero">
+      <h1>Explain The Output</h1>
+      <p class="subtitle">Detailed breakdown and localization of internal planning, product creation, and sharing data into natural Bengali.</p>
+    </header>
+
+    <!-- INPUT SECTION -->
+    <section class="section-card">
+      <div class="section-head">
+        <div class="step-icon">📝</div>
+        <div>
+          <h2>Input Information and Data</h2>
+          <p>Fill in the data for each phase of your workflow.</p>
+        </div>
+      </div>
+      <div class="section-body">
+        
+        <div class="input-grid">
+            <div>
+                <label for="inputA">A. Information and Data – For internal planning and understanding before I begin.</label>
+                <textarea id="inputA" placeholder="Enter planning data..."></textarea>
+            </div>
+            <div>
+                <label for="inputB">B. Information and Data – For internal use while creating my product.</label>
+                <textarea id="inputB" placeholder="Enter creation data..."></textarea>
+            </div>
+        </div>
+
+        <div class="input-grid">
+            <div>
+                <label for="inputC">C. Information and Data – For internal planning and understanding before uploading and sharing my product.</label>
+                <textarea id="inputC" placeholder="Enter pre-upload data..."></textarea>
+            </div>
+            <div>
+                <label for="inputD">D. Information and Data – For internal use while uploading and sharing my product.</label>
+                <textarea id="inputD" placeholder="Enter sharing data..."></textarea>
+            </div>
+        </div>
+
+        <div class="button-row">
+          <button class="primary-btn" onclick="buildPrompt()">Generate Explanation Prompt</button>
+          <button class="copy-btn" onclick="copyText()">Copy Prompt</button>
+          <a class="link-button secondary-btn" href="https://chatgpt.com/" target="_blank">Open ChatGPT</a>
+          <button class="secondary-btn" onclick="clearAll()">Clear</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESULT SECTION -->
+    <section class="section-card">
+      <div class="section-head">
+        <div class="step-icon">📋</div>
+        <div>
+          <h2>Final Localized Prompt</h2>
+          <p>The output is formatted for high-quality conversational Bengali analysis.</p>
+        </div>
+      </div>
+      <div class="section-body">
+        <textarea id="generatedPrompt" readonly placeholder="Your generated prompt will appear here..."></textarea>
+      </div>
+    </section>
+
+    <footer>
+      Copyright &copy; <script>document.write(new Date().getFullYear())</script> Siva Prasad Mukherjee. All Rights Reserved.
+    </footer>
+  </div>
+
+  <div id="toast" class="toast">Copied to clipboard</div>
+
+  <script>
+    function buildPrompt() {
+      const a = document.getElementById('inputA').value || "[No Data Provided]";
+      const b = document.getElementById('inputB').value || "[No Data Provided]";
+      const c = document.getElementById('inputC').value || "[No Data Provided]";
+      const d = document.getElementById('inputD').value || "[No Data Provided]";
+
+      // PROMPT PRESERVED EXACTLY
+      const fullPrompt = `CONTEXT
+
+এই প্রম্পটের আউটপুট থেকে আমি যেটা বুঝতে চেয়েছি বা চাইছি তাহল –
+
+A. Information and Data – For internal planning and understanding before I begin.
+
+${a}
+
+B. Information and Data – For internal use while creating my product.
+
+${b}
+
+C. Information and Data – For internal planning and understanding before uploading and sharing my product.
+
+${c}
+
+D. Information and Data – For internal use while uploading and sharing my product.
+
+${d}
+
+BENGALI LOCALIZATION LAYER
+
+Please write the output of the PROMPT below in the most spontaneous, natural-sounding modern conversational Bengali as spoken in Kolkata, West Bengal, India.
+
+The writing should be easy for a 21-year-old to understand while maintaining high editorial quality, clarity, precision, and natural readability.
+
+Strict Rules
+
+- Reflect Kolkata conversational cadence through sentence rhythm and phrasing by using slightly formal, polite, and smoothly flowing sentence structures with balanced pacing. Avoid slang, regional grammar, overly literary wording, or awkward literal translations.
+- Always use the formal "আপনি", never "তুমি".
+- The tone should remain warm, conversational, approachable, confident, and quietly authoritative.
+- Write as if speaking directly to one person in a natural face-to-face conversation.
+- Do not translate literally. Rewrite naturally so the output feels as though it was originally written in Bengali.
+- Preserve the original meaning, intent, emotional tone, and persuasive effect without adding, removing, or changing information.
+
+TASK
+
+1, এই পয়েন্টগুলো এখনও আমার কাছে Crystal Clear হয়নি – আমাকে এই পয়েন্টগুলো উদাহরণ সহযোগে বিস্তারিত ভাবে বুঝিয়ে দাও।
+2, এই পয়েন্টগুলোর সংক্ষিপ্তসার আমাকে একটা লিস্টে সাজিয়ে দাও।
+
+RULE (MANDATORY)
+
+Please assign a name to the output of this prompt for future reference.`;
+
+      document.getElementById('generatedPrompt').value = fullPrompt;
+    }
+
+    async function copyText() {
+      const el = document.getElementById('generatedPrompt');
+      if (!el.value) return;
+      await navigator.clipboard.writeText(el.value);
+      const t = document.getElementById('toast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    function clearAll() {
+      ['inputA','inputB','inputC','inputD','generatedPrompt'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+    }
+  </script>
+</body>
+</html>
